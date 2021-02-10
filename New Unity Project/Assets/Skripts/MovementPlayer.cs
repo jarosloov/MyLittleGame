@@ -2,52 +2,74 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class MovementPlayer : MonoBehaviour
 {
+
     public float speed;
-    public float HeightJump;
-    public float distanceToTheGround;
-
-    private Rigidbody rb;
     private float moveInput;
-    private bool facingRight = true;
-    private bool groundTouch;
-    private Transform checkingGround;
-    private LayerMask definitionOfLand;
-    
+    private Rigidbody2D rb;
+    public bool faceRight = true;
 
+
+    public float Jumpforce;
+    private bool isGround;
+    public Transform groundCheak;
+    private int ExtraJump;
+    public int extraJumpValue;
+    public float cheakRadius;
+    public LayerMask WhatIsGround;
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    // Update is called once per frame
+    void Update()
     {
-        MovePositionX();
+        if (isGround == true)
+        {
+            ExtraJump = extraJumpValue;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && ExtraJump > 0)
+        {
+            rb.velocity = Vector2.up * Jumpforce;
+            ExtraJump--;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && ExtraJump == 0 && isGround == true)
+        {
+            rb.velocity = Vector2.up * Jumpforce;
+        }
     }
 
-    void MovePositionX()
+    private void FixedUpdate()
     {
-        //groundTouch = Physics2D.OverlapCircle(checkingGround.position, distanceToTheGround);
-        
+        isGround = Physics2D.OverlapCircle(groundCheak.position, cheakRadius, WhatIsGround);
+
         moveInput = Input.GetAxis("Horizontal");
-        rb.velocity =new Vector3(moveInput *speed, rb.position.z);
-        if (facingRight == false && moveInput > 0)
-            TurnAround();
-        else if (facingRight == true && moveInput < 0)
-            TurnAround();
+        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
 
+        if (faceRight == false && moveInput > 0)
+        {
+            Flip();
+        }
+
+        if (faceRight == true && moveInput < 0)
+        {
+            Flip();
+        }
     }
 
-    void TurnAround()
+    void Flip()
     {
-        facingRight = !facingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
-    }
+        faceRight = !faceRight;
+        Vector3 Scale = transform.localScale;
+        Scale.x *= -1;
+        transform.localScale = Scale;
+    }  
 
 
-   
-    
+
+
 }
